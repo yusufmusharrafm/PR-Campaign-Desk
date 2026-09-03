@@ -79,3 +79,39 @@ class CampaignDetailResponse(CampaignResponse):
     activity_logs: List[ActivityLogResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# --- AI Assistant Schemas ---
+class AISummarizeRequest(BaseModel):
+    story_summary: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class AISummarizeResponse(BaseModel):
+    concise_summary: str
+    key_talking_points: List[str]
+
+
+class AINextActionRequest(BaseModel):
+    status: str
+    target_publication: Optional[str] = None
+    story_summary: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class AINextActionResponse(BaseModel):
+    suggested_next_action: str
+    reasoning: str
+
+
+class AIDraftFollowupRequest(BaseModel):
+    client_name: str
+    target_publication: Optional[str] = None
+    story_summary: Optional[str] = None
+    tone: Optional[str] = "Professional and persuasive"
+
+
+class AIDraftFollowupResponse(BaseModel):
+    subject: str
+    body: str
+

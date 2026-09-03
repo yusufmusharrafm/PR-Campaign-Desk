@@ -1,87 +1,132 @@
 # PR Campaign Desk
 
-> Campaign operations workspace for modern PR teams.
+> **A production-ready internal campaign-management workspace for modern PR agencies.**
 
-**PR Campaign Desk** is an internal web application designed to help PR professionals manage client campaigns through story development, article drafting, client review, media outreach, and publication tracking, supported by a human-in-the-loop AI Assistant.
+PR Campaign Desk enables PR professionals to manage client campaigns through every stage of story development—from initial pitch creation to media publication—with automated audit activity logging and human-in-the-loop AI assistance.
 
 ---
 
-## 🏗️ Architecture
+## 🌟 Key Product Features
 
-PR Campaign Desk uses a lightweight monorepo architecture:
+- **8-Stage Workflow Engine**: Explicit status management across `NEW` → `STORY_DEVELOPMENT` → `ARTICLE_DRAFT` → `CLIENT_REVIEW` → `APPROVED` → `MEDIA_OUTREACH` → `PUBLISHED` → `COMPLETED`.
+- **Audit Activity Trail**: Automatic history logging of status transitions, field edits, and AI assistance with actor attribution and timestamps.
+- **Human-in-the-Loop AI Assistant**:
+  - **Summarize Campaign**: Synthesizes story angles and background notes into talking points.
+  - **Suggest Next Action**: Recommends immediate strategic next steps based on stage and publication.
+  - **Draft Pitch Email**: Generates tailored media pitch emails with customizable tone.
+  - *Human Control*: AI output is advisory-only and must be explicitly applied by the user. Does not mutate database directly.
+  - *Graceful Fallback*: Clear 503 message if `OPENAI_API_KEY` is missing while maintaining core campaign operations.
+- **Dual Dashboard Views**: Toggle between a sortable **Table View** and **Visual Status Grouping**.
+- **RESTful API**: Fast and clean OpenAPI endpoints built on FastAPI and SQLite.
+
+---
+
+## 📐 Monorepo Architecture
 
 ```
 PR-Campaign-Desk/
-├── backend/    # FastAPI REST API + SQLAlchemy ORM (SQLite)
-├── frontend/   # Next.js (App Router) + TypeScript + Tailwind CSS
-├── .gitignore
-├── .env.example
-└── README.md
+├── backend/                  # FastAPI Application
+│   ├── app/
+│   │   ├── config.py         # Pydantic BaseSettings
+│   │   ├── database.py       # SQLAlchemy SQLite connection
+│   │   ├── main.py           # FastAPI entrypoint & router registration
+│   │   ├── models.py         # Campaign & ActivityLog ORM models
+│   │   ├── schemas.py        # Pydantic request/response schemas
+│   │   ├── routers/
+│   │   │   ├── campaigns.py  # REST CRUD endpoints
+│   │   │   └── ai.py         # AI Assistant endpoints
+│   │   └── services/
+│   │       ├── campaign_service.py # Business logic & audit logging
+│   │       └── ai_service.py       # OpenAI client & prompt guardrails
+│   ├── tests/                # Automated pytest suite
+│   ├── seed.py               # Database seeding script (8 campaigns across 8 stages)
+│   └── requirements.txt
+│
+└── frontend/                 # Next.js App Router Application
+    ├── src/
+    │   ├── app/
+    │   │   ├── page.tsx                  # Dashboard & Campaign List
+    │   │   └── campaigns/[id]/page.tsx   # Campaign Workspace
+    │   ├── components/
+    │   │   ├── ui/                       # Badges (StatusBadge, PriorityBadge)
+    │   │   ├── campaigns/                # Stepper, Details Editor, Status Grouping
+    │   │   └── ai/                       # AICopilotDrawer (Slide-over panel)
+    │   └── lib/
+    │       ├── api.ts                    # REST fetch client wrappers
+    │       └── types.ts                  # Shared TypeScript interfaces
+    └── package.json
 ```
-
-### Technology Stack
-- **Frontend**: Next.js 15, TypeScript, Tailwind CSS
-- **Backend**: Python 3.12+, FastAPI, Uvicorn, Pydantic v2, SQLAlchemy
-- **Database**: SQLite
-- **Testing**: `pytest` + `httpx` (FastAPI TestClient)
-- **AI Integration**: OpenAI API (Stateless human-in-the-loop assistant)
 
 ---
 
-## 🚀 Quick Setup & Local Running
+## 🚀 Quickstart & Local Setup
 
-### Environment Variables
-Copy `.env.example` to `.env` in the root directory:
+### Prerequisites
+- Python 3.12+
+- Node.js 18+ and npm
+
+### 1. Backend Setup
+
 ```bash
-cp .env.example .env
+cd backend
+
+# Create and activate Python virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Create environment config (optional: set OPENAI_API_KEY for live AI)
+cp ../.env.example .env
+
+# Populate SQLite database with fictional demo data (8 campaigns across all 8 stages)
+python seed.py
+
+# Start FastAPI server
+uvicorn app.main:app --reload --port 8000
 ```
-Default settings:
-```env
-DATABASE_URL=sqlite:///./pr_campaign_desk.db
-OPENAI_API_KEY=your_openai_api_key_here # Optional
+*Backend runs at `http://127.0.0.1:8000`. Interactive API Docs are available at `http://127.0.0.1:8000/docs`.*
+
+---
+
+### 2. Frontend Setup
+
+In a new terminal:
+
+```bash
+cd frontend
+
+# Install Node dependencies
+npm install
+
+# Run Next.js development server
+npm run dev
+```
+*Frontend app runs at `http://localhost:3000`.*
+
+---
+
+## 🧪 Running Automated Tests
+
+### Backend Test Suite (Pytest)
+
+Run unit and integration tests (in-memory SQLite, CRUD operations, activity log triggers, seed verification, and mocked AI endpoints):
+
+```bash
+backend/.venv/bin/pytest backend/tests
+```
+
+### Frontend Type-Checking & Build
+
+```bash
+npm --prefix frontend run build
 ```
 
 ---
 
-### Backend Setup & Server
+## 🛡️ AI Safety & Guardrails
 
-1. **Navigate to backend and setup environment**:
-   ```bash
-   cd backend
-   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-2. **Run FastAPI Server**:
-   ```bash
-   uvicorn app.main:app --reload --port 8000
-   ```
-   *Health Check*: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
-
-3. **Run Tests**:
-   ```bash
-   pytest tests
-   ```
-
----
-
-### Frontend Setup & Server
-
-1. **Navigate to frontend and install dependencies**:
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-2. **Run Next.js Dev Server**:
-   ```bash
-   npm run dev
-   ```
-   *Application URL*: [http://localhost:3000](http://localhost:3000)
-
----
-
-## 🧪 Testing Strategy
-- Automated unit and API integration tests are located in `backend/tests/`.
-- Run pytest suite: `backend/.venv/bin/pytest backend/tests`
+1. **Advisory Role**: The AI Assistant cannot directly modify database records. Suggestions must be manually applied by the user.
+2. **Negative Prompting**: The system prompt explicitly forbids inventing journalist names, email addresses, or publication guarantees.
+3. **Fail-Safe Fallback**: If `OPENAI_API_KEY` is not present, the system displays a clear "AI Assistant Unavailable" alert, allowing the user to manage campaigns uninterrupted.

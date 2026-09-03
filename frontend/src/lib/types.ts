@@ -81,3 +81,19 @@ export interface ActivityLog {
 export interface CampaignDetail extends Campaign {
   activity_logs: ActivityLog[];
 }
+
+// --- AI Assistant Types ---
+export interface AISummarizeResponse {
+  concise_summary: string;
+  key_talking_points: string[];
+}
+
+export interface AINextActionResponse {
+  suggested_next_action: string;
+  reasoning: string;
+}
+
+export interface AIDraftFollowupResponse {
+  subject: string;
+  body: string;
+}

@@ -64,65 +64,93 @@ export default function Dashboard() {
   }, [campaigns]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-      {/* Top Navbar */}
-      <header className="border-b border-slate-800/80 bg-slate-900/60 sticky top-0 z-40 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
+    <div className="min-h-screen text-slate-100 flex flex-col font-sans relative">
+      {/* Top Glass Navbar */}
+      <header className="border-b border-white/10 glass-panel sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-500 flex items-center justify-center font-black text-white text-base shadow-lg shadow-indigo-500/30">
               PR
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white tracking-tight leading-none">
-                PR Campaign Desk
-              </h1>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Campaign operations workspace for modern PR teams
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-black text-white tracking-tight leading-none">
+                  PR Campaign Desk
+                </h1>
+                <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">
+                  Enterprise
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1 font-medium">
+                Internal campaign operations workspace for modern PR agencies
               </p>
             </div>
           </div>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-md shadow-indigo-600/20 active:scale-95"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white transition-all shadow-lg shadow-indigo-600/30 active:scale-95"
           >
-            <span>+</span> New Campaign
+            <span className="text-sm">+</span> New Campaign
           </button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Stats Metrics Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              Total Campaigns
-            </p>
-            <p className="text-2xl font-bold text-white mt-1">{stats.total}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+          <div className="glass-panel glass-panel-hover rounded-2xl p-5 relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Total Campaigns
+              </p>
+              <span className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-sm font-bold">
+                📁
+              </span>
+            </div>
+            <p className="text-3xl font-black text-white mt-2 tracking-tight">{stats.total}</p>
           </div>
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              Active Campaigns
-            </p>
-            <p className="text-2xl font-bold text-indigo-400 mt-1">{stats.active}</p>
+
+          <div className="glass-panel glass-panel-hover rounded-2xl p-5 relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Active Campaigns
+              </p>
+              <span className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-sm font-bold">
+                ⚡
+              </span>
+            </div>
+            <p className="text-3xl font-black text-indigo-400 mt-2 tracking-tight">{stats.active}</p>
           </div>
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              High Priority
-            </p>
-            <p className="text-2xl font-bold text-rose-400 mt-1">{stats.highPriority}</p>
+
+          <div className="glass-panel glass-panel-hover rounded-2xl p-5 relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                High Priority
+              </p>
+              <span className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center text-sm font-bold">
+                🔥
+              </span>
+            </div>
+            <p className="text-3xl font-black text-rose-400 mt-2 tracking-tight">{stats.highPriority}</p>
           </div>
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              Completed
-            </p>
-            <p className="text-2xl font-bold text-emerald-400 mt-1">{stats.completed}</p>
+
+          <div className="glass-panel glass-panel-hover rounded-2xl p-5 relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Completed
+              </p>
+              <span className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm font-bold">
+                ✓
+              </span>
+            </div>
+            <p className="text-3xl font-black text-emerald-400 mt-2 tracking-tight">{stats.completed}</p>
           </div>
         </div>
 
         {/* Filter Controls & View Switcher */}
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <div className="glass-panel rounded-2xl p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-xl">
           {/* Search and Filters */}
           <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <div className="relative flex-1 max-w-md">
@@ -131,12 +159,12 @@ export default function Dashboard() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by title, client, publication..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                className="w-full glass-input rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-3 top-2.5 text-xs text-slate-500 hover:text-slate-300"
+                  className="absolute right-3 top-2.5 text-xs font-semibold text-slate-400 hover:text-white"
                 >
                   Clear
                 </button>
@@ -147,11 +175,11 @@ export default function Dashboard() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
+                className="glass-input rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none"
               >
-                <option value="">All Stages</option>
+                <option value="" className="bg-slate-900">All Stages</option>
                 {ALL_STATUSES.map((s) => (
-                  <option key={s.key} value={s.key}>
+                  <option key={s.key} value={s.key} className="bg-slate-900">
                     {s.label}
                   </option>
                 ))}
@@ -160,11 +188,11 @@ export default function Dashboard() {
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
+                className="glass-input rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none"
               >
-                <option value="">All Priorities</option>
+                <option value="" className="bg-slate-900">All Priorities</option>
                 {ALL_PRIORITIES.map((p) => (
-                  <option key={p.key} value={p.key}>
+                  <option key={p.key} value={p.key} className="bg-slate-900">
                     {p.label}
                   </option>
                 ))}
@@ -173,12 +201,12 @@ export default function Dashboard() {
           </div>
 
           {/* View Switcher Toggle */}
-          <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1">
+          <div className="flex items-center gap-1 bg-slate-950/80 border border-white/10 rounded-xl p-1.5 backdrop-blur-md">
             <button
               onClick={() => setViewMode("table")}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === "table"
-                  ? "bg-indigo-600 text-white shadow-sm"
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30"
                   : "text-slate-400 hover:text-slate-200"
               }`}
             >
@@ -186,9 +214,9 @@ export default function Dashboard() {
             </button>
             <button
               onClick={() => setViewMode("grid")}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === "grid"
-                  ? "bg-indigo-600 text-white shadow-sm"
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30"
                   : "text-slate-400 hover:text-slate-200"
               }`}
             >
@@ -199,33 +227,33 @@ export default function Dashboard() {
 
         {/* Content View */}
         {loading ? (
-          <div className="py-20 flex flex-col items-center justify-center text-slate-400 space-y-3">
-            <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-sm">Loading campaigns...</p>
+          <div className="py-24 flex flex-col items-center justify-center text-slate-400 space-y-4">
+            <div className="w-10 h-10 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-sm font-semibold text-slate-300">Loading campaign dashboard...</p>
           </div>
         ) : error ? (
-          <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-6 text-center text-rose-400 space-y-2">
-            <p className="font-semibold">Unable to load campaigns</p>
+          <div className="glass-panel border-rose-500/30 rounded-2xl p-8 text-center text-rose-300 space-y-3 shadow-xl">
+            <p className="font-bold text-lg">Unable to load campaigns</p>
             <p className="text-sm text-slate-400">{error}</p>
             <button
               onClick={loadData}
-              className="mt-3 px-4 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-200 hover:bg-slate-700"
+              className="mt-3 px-5 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors"
             >
               Retry Connection
             </button>
           </div>
         ) : campaigns.length === 0 ? (
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-12 text-center space-y-4">
-            <div className="w-12 h-12 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto text-xl font-bold">
+          <div className="glass-panel rounded-2xl p-16 text-center space-y-5 shadow-2xl">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto text-2xl font-bold border border-indigo-500/20">
               📋
             </div>
-            <h3 className="text-lg font-semibold text-white">No campaigns found</h3>
-            <p className="text-sm text-slate-400 max-w-sm mx-auto">
+            <h3 className="text-xl font-bold text-white">No campaigns found</h3>
+            <p className="text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
               No campaign matches your current search or filter criteria. Create a new campaign to get started.
             </p>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+              className="px-6 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white transition-all shadow-lg shadow-indigo-600/30"
             >
               + Create Campaign
             </button>
@@ -234,34 +262,34 @@ export default function Dashboard() {
           <StatusGroupView campaigns={campaigns} />
         ) : (
           /* Table View */
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl overflow-hidden shadow-xl">
+          <div className="glass-panel rounded-2xl overflow-hidden shadow-2xl">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-slate-300">
-                <thead className="bg-slate-950/80 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800/80">
+                <thead className="bg-slate-950/80 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-white/10">
                   <tr>
-                    <th className="px-6 py-3.5">Campaign & Client</th>
-                    <th className="px-6 py-3.5">Stage</th>
-                    <th className="px-6 py-3.5">Priority</th>
-                    <th className="px-6 py-3.5">Target Publication</th>
-                    <th className="px-6 py-3.5">Assigned Pro</th>
-                    <th className="px-6 py-3.5">Next Action</th>
-                    <th className="px-6 py-3.5 text-right">Action</th>
+                    <th className="px-6 py-4">Campaign & Client</th>
+                    <th className="px-6 py-4">Stage</th>
+                    <th className="px-6 py-4">Priority</th>
+                    <th className="px-6 py-4">Target Publication</th>
+                    <th className="px-6 py-4">Assigned Pro</th>
+                    <th className="px-6 py-4">Next Action Strategy</th>
+                    <th className="px-6 py-4 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-white/5">
                   {campaigns.map((campaign) => (
                     <tr
                       key={campaign.id}
-                      className="hover:bg-slate-800/40 transition-colors group"
+                      className="hover:bg-white/5 transition-colors group"
                     >
                       <td className="px-6 py-4">
                         <Link
                           href={`/campaigns/${campaign.id}`}
-                          className="font-semibold text-white group-hover:text-indigo-400 transition-colors block"
+                          className="font-bold text-white group-hover:text-indigo-300 transition-colors block text-sm"
                         >
                           {campaign.title}
                         </Link>
-                        <span className="text-xs text-slate-400">
+                        <span className="text-xs text-slate-400 font-medium">
                           {campaign.client_name}
                         </span>
                       </td>
@@ -274,22 +302,22 @@ export default function Dashboard() {
                         <PriorityBadge priority={campaign.priority} />
                       </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap text-slate-300 font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-indigo-300 font-semibold text-xs">
                         {campaign.target_publication || "—"}
                       </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap text-slate-300">
+                      <td className="px-6 py-4 whitespace-nowrap text-slate-300 text-xs">
                         {campaign.assigned_person || "Unassigned"}
                       </td>
 
-                      <td className="px-6 py-4 max-w-xs truncate text-xs text-slate-400">
+                      <td className="px-6 py-4 max-w-xs truncate text-xs text-slate-300">
                         {campaign.next_action || "—"}
                       </td>
 
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <Link
                           href={`/campaigns/${campaign.id}`}
-                          className="inline-flex items-center gap-1 text-xs font-medium text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 px-3 py-1.5 rounded-lg transition-colors"
+                          className="inline-flex items-center gap-1 text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-600/30 border border-indigo-500/30 px-3.5 py-1.5 rounded-xl transition-all shadow-sm"
                         >
                           Open Workspace →
                         </Link>

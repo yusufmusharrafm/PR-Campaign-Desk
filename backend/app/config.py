@@ -13,5 +13,11 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
+    def __init__(self, **values):
+        super().__init__(**values)
+        # Handle serverless read-only filesystem on Vercel
+        if os.getenv("VERCEL") and self.DATABASE_URL == "sqlite:///./pr_campaign_desk.db":
+            self.DATABASE_URL = "sqlite:////tmp/pr_campaign_desk.db"
+
 
 settings = Settings()
