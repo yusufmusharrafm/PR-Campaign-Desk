@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
+from app.database import engine, Base
+from app.routers import campaigns
+
+# Initialize SQLite database tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="PR Campaign Desk API",
@@ -16,6 +21,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register Routers
+app.include_router(campaigns.router)
 
 
 @app.get("/health")
