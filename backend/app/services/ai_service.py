@@ -1,7 +1,8 @@
 import json
 from typing import Optional
 from fastapi import HTTPException, status
-from openai import OpenAI, OpenAIError
+from google import genai
+from google.genai import types as genai_types
 from app.config import settings
 from app.schemas import (
     AISummarizeResponse,
@@ -20,42 +21,49 @@ CRITICAL GUARDRAILS:
 """
 
 
-def _get_openai_client() -> OpenAI:
-    if not settings.OPENAI_API_KEY or not settings.OPENAI_API_KEY.strip():
+def _generate_ai_json(prompt: str) -> dict:
+    """
+    Calls Google Gemini API using GEMINI_API_KEY.
+    """
+    gemini_key = settings.GEMINI_API_KEY and settings.GEMINI_API_KEY.strip()
+
+    if not gemini_key:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="AI Assistant unavailable. OPENAI_API_KEY is not configured."
+            detail="AI Assistant unavailable. Configure GEMINI_API_KEY in backend environment."
         )
-    return OpenAI(api_key=settings.OPENAI_API_KEY)
+
+    try:
+        client = genai.Client(api_key=gemini_key)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                response_mime_type="application/json",
+                temperature=0.7,
+            ),
+        )
+        return json.loads(response.text)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Gemini AI Assistant request failed: {str(e)}"
+        )
 
 
 def summarize_campaign(story_summary: Optional[str], notes: Optional[str]) -> AISummarizeResponse:
-    client = _get_openai_client()
-
     user_content = f"Story Summary: {story_summary or 'None provided.'}\nBackground Notes: {notes or 'None provided.'}"
     prompt = f"{user_content}\n\nProvide a concise 2-sentence campaign summary and 3 bullet-point key talking points as JSON format: {{\"concise_summary\": \"...\", \"key_talking_points\": [\"...\", \"...\", \"...\"]}}"
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            response_format={"type": "json_object"},
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7
-        )
-        content = response.choices[0].message.content
-        data = json.loads(content)
+        data = _generate_ai_json(prompt)
         return AISummarizeResponse(
             concise_summary=data.get("concise_summary", "Summary unavailable."),
             key_talking_points=data.get("key_talking_points", [])
         )
-    except OpenAIError as e:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"AI Assistant request failed: {str(e)}"
-        )
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -69,8 +77,6 @@ def suggest_next_action(
     story_summary: Optional[str],
     notes: Optional[str]
 ) -> AINextActionResponse:
-    client = _get_openai_client()
-
     prompt = f"""Current Campaign Stage: {status_stage}
 Target Publication: {target_publication or 'Not specified'}
 Story Summary: {story_summary or 'None provided.'}
@@ -80,26 +86,13 @@ Based on the PR campaign workflow, suggest the single most effective immediate n
 Return JSON format: {{\"suggested_next_action\": \"...\", \"reasoning\": \"...\"}}"""
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            response_format={"type": "json_object"},
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7
-        )
-        content = response.choices[0].message.content
-        data = json.loads(content)
+        data = _generate_ai_json(prompt)
         return AINextActionResponse(
             suggested_next_action=data.get("suggested_next_action", "Review campaign details."),
             reasoning=data.get("reasoning", "Recommended step based on workflow stage.")
         )
-    except OpenAIError as e:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"AI Assistant request failed: {str(e)}"
-        )
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -113,8 +106,6 @@ def draft_followup(
     story_summary: Optional[str],
     tone: Optional[str]
 ) -> AIDraftFollowupResponse:
-    client = _get_openai_client()
-
     prompt = f"""Client: {client_name}
 Target Publication/Category: {target_publication or 'Tech Media'}
 Story Summary: {story_summary or 'New product launch'}
@@ -125,26 +116,13 @@ Use placeholders like [Editor Name] or [Target Reporter].
 Return JSON format: {{\"subject\": \"...\", \"body\": \"...\"}}"""
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            response_format={"type": "json_object"},
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7
-        )
-        content = response.choices[0].message.content
-        data = json.loads(content)
+        data = _generate_ai_json(prompt)
         return AIDraftFollowupResponse(
             subject=data.get("subject", "Media Pitch"),
             body=data.get("body", "Pitch draft text.")
         )
-    except OpenAIError as e:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"AI Assistant request failed: {str(e)}"
-        )
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

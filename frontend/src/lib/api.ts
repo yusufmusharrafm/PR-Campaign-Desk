@@ -9,13 +9,9 @@ import {
   AIDraftFollowupResponse,
 } from "./types";
 
-const getApiBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-  if (typeof window !== "undefined") return "/api";
-  return "http://127.0.0.1:8000/api";
-};
-
-const API_BASE_URL = getApiBaseUrl();
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== "undefined" ? "/api" : "http://127.0.0.1:8000/api");
 
 export async function fetchCampaigns(params?: {
   status?: string;

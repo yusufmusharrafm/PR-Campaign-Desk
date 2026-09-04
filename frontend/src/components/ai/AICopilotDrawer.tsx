@@ -192,7 +192,7 @@ export const AICopilotDrawer: React.FC<AICopilotDrawerProps> = ({
                 </div>
                 <p className="leading-relaxed text-slate-300">{error}</p>
                 <p className="text-[11px] text-slate-400">
-                  All campaign management operations remain active. Configure OPENAI_API_KEY in backend environment to enable live AI responses.
+                  All campaign management operations remain active. Configure GEMINI_API_KEY (Get a free key at aistudio.google.com) in your backend environment.
                 </p>
               </div>
             )}

@@ -1,132 +1,192 @@
-# PR Campaign Desk
+# 📡 PR Campaign Desk
 
-> **A production-ready internal campaign-management workspace for modern PR agencies.**
+> **Enterprise Campaign Operations Workspace for Modern PR Agencies**
 
-PR Campaign Desk enables PR professionals to manage client campaigns through every stage of story development—from initial pitch creation to media publication—with automated audit activity logging and human-in-the-loop AI assistance.
-
----
-
-## 🌟 Key Product Features
-
-- **8-Stage Workflow Engine**: Explicit status management across `NEW` → `STORY_DEVELOPMENT` → `ARTICLE_DRAFT` → `CLIENT_REVIEW` → `APPROVED` → `MEDIA_OUTREACH` → `PUBLISHED` → `COMPLETED`.
-- **Audit Activity Trail**: Automatic history logging of status transitions, field edits, and AI assistance with actor attribution and timestamps.
-- **Human-in-the-Loop AI Assistant**:
-  - **Summarize Campaign**: Synthesizes story angles and background notes into talking points.
-  - **Suggest Next Action**: Recommends immediate strategic next steps based on stage and publication.
-  - **Draft Pitch Email**: Generates tailored media pitch emails with customizable tone.
-  - *Human Control*: AI output is advisory-only and must be explicitly applied by the user. Does not mutate database directly.
-  - *Graceful Fallback*: Clear 503 message if `OPENAI_API_KEY` is missing while maintaining core campaign operations.
-- **Dual Dashboard Views**: Toggle between a sortable **Table View** and **Visual Status Grouping**.
-- **RESTful API**: Fast and clean OpenAPI endpoints built on FastAPI and SQLite.
+PR Campaign Desk is a full-stack, monorepo application engineered to streamline media relations, campaign stage tracking, audit logging, and AI-assisted pitching for public relations teams.
 
 ---
 
-## 📐 Monorepo Architecture
+## 🛠️ Technology Stack
+
+| Layer | Technologies & Tools | Key Features |
+| :--- | :--- | :--- |
+| **Frontend UI** | **Next.js 16 (App Router)**, **TypeScript**, **Tailwind CSS** | Premium Glassmorphism Dark Mode, Dual Views (Table & Status Grouping), Interactive Workflow Steppers |
+| **Backend API** | **FastAPI**, **Python 3.12**, **Pydantic v2** | High-performance async REST API, auto-generated OpenAPI / Swagger docs |
+| **AI Copilot** | **Google Gemini 2.5 Flash API** (`google-genai`) | Free-tier compatible, structured JSON mode, Human-in-the-Loop advisory guardrails |
+| **Database & ORM** | **SQLAlchemy 2.0**, **SQLite** / **PostgreSQL** | Database-agnostic ORM, automated table initialization, `psycopg2-binary` cloud database ready |
+| **Testing** | **Pytest**, **Starlette TestClient** | 100% test coverage across campaign CRUD operations, audit logging, and AI fallback rules |
+| **Deployment** | **Vercel Multi-Service Runtime** (`vercel.json`) | Monorepo deployment routing Next.js static pages and FastAPI serverless functions on a single domain |
+
+---
+
+## 🎯 The Problem & The Solution
+
+### The PR Agency Problem
+1. **Fragmented Workflows**: PR teams rely on scattered spreadsheets, email threads, and messaging apps to track pitching progress, leading to missed deadlines and client confusion.
+2. **Lack of Auditability**: Pitch modifications, client approvals, and media outreach status changes happen without recorded history or accountability.
+3. **Risks of Unchecked AI**: Autonomous AI tools risk hallucinating real reporter names, inventing fake email addresses, or making unapproved status changes.
+
+### The PR Campaign Desk Solution
+- **8-Stage Structured Workflow**: Every story moves through strict, sequential PR lifecycle stages from initial concept (`NEW`) to final media publication (`COMPLETED`).
+- **Immutable Audit Trail**: Automatic activity logging tracks every stage transition, field update, and timestamp.
+- **Human-in-the-Loop AI Assistant**: Powered by **Google Gemini 2.5 Flash**, the AI acts purely as an advisory copilot. Suggestions must be manually reviewed and approved by a human PR professional before applying to campaign records.
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    User([PR Professional / User]) -->|Browser HTTP Requests| Frontend[Next.js 16 Frontend App Router]
+    Frontend -->|API Rewrites /api/*| Backend[FastAPI Backend Engine]
+    
+    subgraph Backend Core Engine
+        Backend -->|ORM Queries| Database[(SQLAlchemy / SQLite & PostgreSQL)]
+        Backend -->|Audit Service| AuditLog[(Immutable Activity Log Table)]
+        Backend -->|JSON Prompts| Gemini[Google Gemini 2.5 Flash API]
+    end
+    
+    Gemini -->|Structured JSON Response| Backend
+    Backend -->|Campaign State & Activity Logs| Frontend
+```
+
+---
+
+## 🔄 8-Stage PR Campaign Workflow
+
+Every campaign progresses through 8 defined operational stages:
+
+| Stage # | Stage Key | Color Indicator | Operational Description |
+| :---: | :--- | :---: | :--- |
+| **1** | `NEW` | 🔵 Slate | Campaign pitch created; initial story angle defined. |
+| **2** | `STORY_DEVELOPMENT` | 🟣 Indigo | Angle refinement, executive quote gathering, and research. |
+| **3** | `ARTICLE_DRAFT` | 🟤 Amber | Drafting press release, media pitch, or executive byline. |
+| **4** | `CLIENT_REVIEW` | 🟠 Orange | Pitch shared with client stakeholders for sign-off. |
+| **5** | `APPROVED` | 🟢 Emerald | Client approval secured; media list finalized. |
+| **6** | `MEDIA_OUTREACH` | 🔵 Blue | Story pitched to target journalists and media outlets. |
+| **7** | `PUBLISHED` | 🟣 Purple | Media coverage secured; story published by outlet. |
+| **8** | `COMPLETED` | 🟢 Teal | Coverage report delivered; campaign archived. |
+
+---
+
+## 🤖 Human-in-the-Loop AI & Guardrail Framework
+
+PR Campaign Desk integrates **Google Gemini 2.5 Flash API** to provide three specialized AI assistant tools:
+
+1. **✨ Campaign Summarizer**: Synthesizes story summaries and notes into a 2-sentence summary and 3 key talking points.
+2. **🎯 Next Action Recommender**: Recommends the optimal next strategic step based on the campaign's current stage and target publication.
+3. **✉️ Media Pitch Email Drafter**: Drafts tailored journalist pitches with customizable tone controls (*Professional*, *Urgent News Hook*, *Friendly & Concise*, *Exclusive Embargo*).
+
+### Strict AI Safety Guardrails
+- **Zero Direct Database Writes**: AI outputs are strictly rendered in a slide-over preview panel. The user must click **"Apply"** to update campaign records.
+- **Anti-Hallucination Prompting**: System instructions explicitly forbid generating real or fake journalist names, forcing placeholders such as `[Editor Name]` or `[Target Reporter]`.
+- **Graceful Error Handling**: If `GEMINI_API_KEY` is missing or API limits are reached, the system returns an HTTP 503 response and displays a helpful UI alert without interrupting core campaign operations.
+
+---
+
+## 📂 Repository Structure
 
 ```
 PR-Campaign-Desk/
-├── backend/                  # FastAPI Application
+├── backend/                  # FastAPI Python Backend
 │   ├── app/
-│   │   ├── config.py         # Pydantic BaseSettings
-│   │   ├── database.py       # SQLAlchemy SQLite connection
-│   │   ├── main.py           # FastAPI entrypoint & router registration
-│   │   ├── models.py         # Campaign & ActivityLog ORM models
-│   │   ├── schemas.py        # Pydantic request/response schemas
-│   │   ├── routers/
-│   │   │   ├── campaigns.py  # REST CRUD endpoints
-│   │   │   └── ai.py         # AI Assistant endpoints
-│   │   └── services/
-│   │       ├── campaign_service.py # Business logic & audit logging
-│   │       └── ai_service.py       # OpenAI client & prompt guardrails
-│   ├── tests/                # Automated pytest suite
-│   ├── seed.py               # Database seeding script (8 campaigns across 8 stages)
-│   └── requirements.txt
+│   │   ├── main.py           # FastAPI entrypoint & CORS middleware
+│   │   ├── config.py         # Settings & environment variables
+│   │   ├── database.py       # SQLAlchemy engine & session maker
+│   │   ├── models.py         # DB models (Campaign, ActivityLog)
+│   │   ├── schemas.py        # Pydantic validation schemas
+│   │   ├── routers/          # API route handlers
+│   │   └── services/         # Business logic & Google Gemini AI service
+│   ├── tests/                # Automated pytest suite (13 tests)
+│   ├── seed.py               # Database seeder (8 default campaigns)
+│   └── requirements.txt      # Python dependencies
 │
-└── frontend/                 # Next.js App Router Application
-    ├── src/
-    │   ├── app/
-    │   │   ├── page.tsx                  # Dashboard & Campaign List
-    │   │   └── campaigns/[id]/page.tsx   # Campaign Workspace
-    │   ├── components/
-    │   │   ├── ui/                       # Badges (StatusBadge, PriorityBadge)
-    │   │   ├── campaigns/                # Stepper, Details Editor, Status Grouping
-    │   │   └── ai/                       # AICopilotDrawer (Slide-over panel)
-    │   └── lib/
-    │       ├── api.ts                    # REST fetch client wrappers
-    │       └── types.ts                  # Shared TypeScript interfaces
-    └── package.json
+├── frontend/                 # Next.js 16 TypeScript Frontend
+│   ├── src/
+│   │   ├── app/              # Next.js App Router (Dashboard & Detail Pages)
+│   │   ├── components/       # UI components (Steppers, Tables, AI Drawer)
+│   │   └── lib/              # Types & API client functions
+│   ├── next.config.ts        # Next.js config & local API dev proxy rewrites
+│   └── package.json          # Node dependencies
+│
+├── vercel.json               # Vercel multi-service monorepo configuration
+├── .env.example              # Environment variable template
+└── README.md                 # Project documentation
 ```
 
 ---
 
-## 🚀 Quickstart & Local Setup
+## 🚀 Quick Start & Local Setup
 
 ### Prerequisites
-- Python 3.12+
-- Node.js 18+ and npm
+- **Python 3.12+**
+- **Node.js 18+** & `npm`
+- Free Google Gemini API Key from **[Google AI Studio](https://aistudio.google.com/app/apikey)**
 
-### 1. Backend Setup
+### 1. Clone & Setup Environment
+```bash
+git clone https://github.com/yusufmusharrafm/PR-Campaign-Desk.git
+cd PR-Campaign-Desk
 
+# Create .env file
+cp .env.example .env
+```
+
+Add your free Gemini API key to `.env`:
+```env
+DATABASE_URL=sqlite:///./pr_campaign_desk.db
+GEMINI_API_KEY=AIzaSyYourFreeGeminiKeyHere
+```
+
+### 2. Run Backend Server
 ```bash
 cd backend
-
-# Create and activate Python virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
 
-# Create environment config (optional: set OPENAI_API_KEY for live AI)
-cp ../.env.example .env
-
-# Populate SQLite database with fictional demo data (8 campaigns across all 8 stages)
+# Seed sample data
 python seed.py
 
 # Start FastAPI server
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
-*Backend runs at `http://127.0.0.1:8000`. Interactive API Docs are available at `http://127.0.0.1:8000/docs`.*
+*Backend runs on `http://127.0.0.1:8000` (API Docs: `http://127.0.0.1:8000/docs`)*
 
----
-
-### 2. Frontend Setup
-
-In a new terminal:
-
+### 3. Run Frontend App
+In a new terminal window:
 ```bash
 cd frontend
-
-# Install Node dependencies
 npm install
-
-# Run Next.js development server
-npm run dev
+npm run dev -- --port 3000
 ```
-*Frontend app runs at `http://localhost:3000`.*
+*Frontend runs on `http://localhost:3000`*
 
 ---
 
-## 🧪 Running Automated Tests
+## 🧪 Automated Testing
 
-### Backend Test Suite (Pytest)
-
-Run unit and integration tests (in-memory SQLite, CRUD operations, activity log triggers, seed verification, and mocked AI endpoints):
-
+Run the backend test suite:
 ```bash
-backend/.venv/bin/pytest backend/tests
+cd backend
+.venv/bin/pytest tests
 ```
-
-### Frontend Type-Checking & Build
-
-```bash
-npm --prefix frontend run build
-```
+*Executes 13 automated tests covering models, campaign CRUD endpoints, audit log generation, and Gemini AI error handling.*
 
 ---
 
-## 🛡️ AI Safety & Guardrails
+## 🌐 Production Deployment (Vercel)
 
-1. **Advisory Role**: The AI Assistant cannot directly modify database records. Suggestions must be manually applied by the user.
-2. **Negative Prompting**: The system prompt explicitly forbids inventing journalist names, email addresses, or publication guarantees.
-3. **Fail-Safe Fallback**: If `OPENAI_API_KEY` is not present, the system displays a clear "AI Assistant Unavailable" alert, allowing the user to manage campaigns uninterrupted.
+PR Campaign Desk is pre-configured for **Vercel Multi-Service Deployment** via `vercel.json`:
+
+1. Import the repository into your Vercel account.
+2. Select the **PR-Campaign-Desk** framework preset.
+3. Configure Environment Variables in Vercel:
+   - `GEMINI_API_KEY`: Your Google Gemini API Key.
+   - `DATABASE_URL`: (Optional) PostgreSQL connection string (e.g. Supabase or Neon). If omitted, falls back to SQLite in `/tmp`.
+
+---
+
+## 📜 License & Acknowledgments
+
+Built for modern PR campaign operations. Powered by Next.js, FastAPI, and Google Gemini API.
